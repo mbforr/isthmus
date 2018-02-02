@@ -1,0 +1,685 @@
+html, body {width:100%; height:100%; padding: 0; margin: 0;}
+
+.fullSize {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 70px;
+    right: 380px;
+    border: none;
+    /*width: 100%;*/
+    z-index: -1000;
+    height: 100%;
+}
+
+.app-menu {
+  background: #F04F50;
+  height: 100%;
+  position: absolute;
+  left: 0;
+  width: 70px;
+  top: 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+  z-index: 1000;
+}
+
+.app-icon {
+  background-color: #F04F50;
+  border-color: rgba(255,255,255,0.2);
+  border-width: 1px;
+/*  border-style: solid;*/  
+  position: relative;
+  top: 10px;
+  width: 50px;
+  height: 50px;
+  border-radius: 4px;
+  margin: auto;
+  padding: 10px;
+  background-image: url(img/carto.svg);
+  background-size: 70%;
+  background-repeat: no-repeat;
+  background-position: center;
+
+}
+
+.app-title {
+  background: rgba(255, 255, 255, .6);
+  height: 70px;
+  width: 100%;
+  position: absolute;
+  top: 0;
+  box-shadow: 0 0 10px rgba(0, 0, 0, .2);
+  z-index: 1;
+}
+
+.app-title h1 {
+  font-size: 16px !important;
+  font-weight: 700 !important;
+  line-height: 15px !important;
+  letter-spacing: 2;
+  padding-left: 85px;
+  padding-top: 18px;
+  text-transform: uppercase !important;
+  font-family: 'Source Sans Pro', Arial, sans-serif !important;
+  color: #3e4042 !important;
+  margin: 10 !important;
+
+}
+
+
+.cartodb-logo {
+  left: 50% !important;
+}
+
+.select-container:before {
+  visibility: hidden !important;
+}
+
+.select-container:after {
+  visibility: hidden !important;
+}
+
+.toolbar-info {
+  padding: 24px;
+  margin: -24px -24px 24px -24px;
+}
+.toolbar-title {
+  font-size: 26px;
+}
+#toolbar {
+  padding: 24px;
+  position: fixed;
+  background: #fff;
+  box-shadow: 0 0 4px rgba(0, 0, 0, .2);
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  overflow: auto;
+  z-index: 2;
+}
+
+select {
+  border: 1px solid #E5E5E5;
+  background-color: #fff;
+  padding: 12px 10px;
+  font-size: 14px;
+  font-family: 'Lato';
+  display: block;
+  width: 100%;
+  margin-bottom: 9px;
+}
+  .select-container {
+    position: relative;
+  }
+  .select-container:before {
+    content:"";
+    width: 5px;
+    height: 2px;
+    background: #666;
+    position: absolute;
+    top: 22px;
+    right: 10px;
+    border-radius: 4px;
+    transform: rotate(-45deg);
+  }
+  .select-container:after {
+    content:"";
+    width: 5px;
+    height: 2px;
+    background: #666;
+    position: absolute;
+    top: 22px;
+    right: 13px;
+    border-radius: 4px;
+    transform: rotate(45deg);
+  }
+
+/*MAPZEN SEARCH*/
+
+.leaflet-pelias-control {
+  box-shadow: none !important;
+  border: 1px solid rgba(34,36,38,.15);
+
+}
+
+.leaflet-pelias-input {
+  font-family: 'Source Sans Pro', Arial, sans-serif !important;
+  color: #3e4042 !important;
+  text-transform: uppercase;
+  letter-spacing: 2;
+}
+
+.leaflet-pelias-results {
+  box-shadow: 0 0 10px rgba(0, 0, 0, .2) !important;
+  border: 1px solid rgba(34,36,38,.15);
+}
+
+.leaflet-pelias-list {
+  font-family: 'Source Sans Pro', Arial, sans-serif !important;
+  color: #3e4042 !important;
+  letter-spacing: 1;
+  font-size: 12px !important;
+}
+
+/*MENU*/
+
+#menuToggle
+{
+  display: block;
+  position: relative;
+  top: 60px;
+  width: 60px;
+  left: 0;
+  
+  z-index: 1;
+  
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+#menuToggle input
+{
+  display: block;
+  width: 30px;
+  height: 32px;
+  position: absolute;
+  top: -7px;
+  left: -5px;
+  
+  cursor: pointer;
+  
+  opacity: 0; /* hide this */
+  z-index: 5; /* and place it over the hamburger */
+  
+  -webkit-touch-callout: none;
+}
+
+/*
+ * Just a quick hamburger
+ */
+#menuToggle span
+{
+  display: block;
+  width: 30px;
+  height: 4px;
+  margin-bottom: 5px;
+  position: relative;
+  
+  background: rgba(255,255,255,0.2);
+  border-radius: 3px;
+  
+  z-index: 1;
+  
+  transform-origin: 4px 0px;
+  
+  transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+              background 0.5s cubic-bezier(0.77,0.2,0.05,1.0),
+              opacity 0.55s ease;
+}
+
+
+#menu
+{
+  position: absolute;
+  width: 300px;
+  margin: -100px 0 0 -50px;
+  padding: 20px;
+  padding-top: 125px;
+  
+  background: #ededed;
+  list-style-type: none;
+  -webkit-font-smoothing: antialiased;
+  /* to stop flickering of text in safari */
+  
+  transform-origin: 0% 0%;
+  transform: translate(-100%, 0);
+  
+  transition: transform 0.5s cubic-bezier(0.77,0.2,0.05,1.0) !important;
+}
+
+#menu li
+{
+  padding: 10px 0;
+  font-size: 22px;
+}
+
+/*
+ * And let's fade it in from the left
+ */
+#menuToggle input:checked ~ ul
+{
+  transform: scale(1.0, 1.0);
+  opacity: 1;
+}
+
+/*INFOWINDOW*/
+
+.CDB-Tooltip-wrapper {
+    display: none;
+    position: absolute;
+    z-index: 1;
+    min-width: 120px;
+    max-width: 180px;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+
+.ui.button {
+  font-family: 'Source Sans Pro', Arial, sans-serif !important;
+}
+
+.cartodb-tooltip-content-wrapper {
+    background: #2E3C43 !important;
+    padding: 20px 24px;
+    font-family: 'Source Sans Pro', Arial, sans-serif !important;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0.05);
+    z-index: 50;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 16px;
+    border-radius: 4px;
+    width: 100% !important;
+  }
+
+.cartodb-tooltip-content-wrapper h4 {
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 16px;
+  margin: 0 !important;
+}
+
+.cartodb-tooltip-content-wrapper h3 {
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 15px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.64);
+  margin: 0 !important;
+}
+
+.cartodb-popup  {
+    position: relative;
+/*    transform: translateY(-24px) translateX(4px);
+*/    border-radius: 4px;
+    background: #FFF;
+    margin: 12px;
+    height: 100% !important;
+    max-height: 300px !important;
+    font-family: 'Source Sans Pro', Arial, sans-serif !important;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.24) !important;
+    cursor: default;
+    -webkit-font-smoothing: antialiased;
+}
+
+.cartodb-popup-content {
+    border-radius: 2px;
+    height: 270 !important;
+    max-height: 300px !important;
+    padding: 12px !important;
+    max-height: 300px !important;
+    width: inherit !important;
+}
+
+.inner-infowindow {
+  height: 100%;
+  padding: 12px;
+}
+
+.cartodb-popup-content-wrapper {
+  margin-bottom: 12px;
+}
+
+.jspContainer {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: 270px !important;
+}
+
+.jspTrack {
+  height: 270px !important;
+}
+
+.cartodb-popup-tip-container {
+    border-right: 24px solid transparent;
+    filter: blur(2px);
+}
+
+.cartodb-popup-tip-container:before {
+    border-right: 24px solid transparent;
+    filter: blur(2px);
+}
+
+.cartodb-popup-close-button {
+    position: absolute !important;;
+    top: -12px !important;
+    right: -12px !important;
+    width: 24px !important;
+    height: 24px !important;
+    border-radius: 50% !important;
+    background: #FFF no-repeat center center !important;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.24) !important;
+    cursor: pointer;
+    z-index: 2;
+}
+
+a.cartodb-popup-close-button:before {
+    content: '';
+    position: absolute;
+    top: 11px !important;
+    left: 8px !important;
+    width: 8px;
+    height: 2px;
+    background: #397DBA;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+/*.jspContainer {
+    position: relative;
+    padding: 16px;
+    height: 288px;
+}*/
+
+.cartodb-popup p {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  line-height: 16px !important;
+  font-family: 'Source Sans Pro', Arial, sans-serif !important;
+  margin: 0 !important;
+}
+
+.cartodb-popup td {
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 16px !important;
+  font-family: 'Source Sans Pro', Arial, sans-serif !important;
+  margin: 0 !important;
+}
+
+.cartodb-popup p.title {
+  font-size: 21px !important;
+  font-weight: 600 !important;
+  line-height: 16px !important;
+  font-family: 'Source Sans Pro', Arial, sans-serif !important;
+  margin: 0 !important;
+}
+
+.cartodb-popup h4 {
+  font-size: 10px !important;
+  font-weight: 400 !important;
+  line-height: 15px !important;
+  text-transform: uppercase !important;
+  font-family: 'Source Sans Pro', Arial, sans-serif !important;
+  color: #636D72 !important;
+  margin: 0 !important;
+}
+
+/*.jspVerticalBar {
+    width: 5px !important;
+    right: 12px !important;
+    bottom: 12px !important;
+    height: inherit !important;
+    padding: 0 !important;
+    transition: background-color 150ms ease-in-out !important;
+    cursor: move !important;
+  }*/
+
+/*.jspScrollable {
+  height: 300px !important;
+}*/
+
+a.cartodb-popup-close-button:after {
+    content: '';
+    position: absolute;
+    top: 11px !important;
+    left: 8px !important;
+    width: 8px;
+    height: 2px;
+    background: #397DBA;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+}
+
+
+/*LEGEND*/
+
+.legend {
+    position: absolute;
+    top: 90px;
+    left: 20px;
+    width: 240px;
+    height: auto;
+    max-height: calc(100vh - 120px);
+    border-radius: 4px;
+    background: #FFF;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.24);
+    box-sizing: border-box;
+    overflow: hidden;
+    z-index: 20000;
+  }
+
+.legend-inner {
+    position: relative;
+    top: 0;
+    right: 0;
+    max-width: 192px;
+    bottom: 0;
+    left: 0;
+    max-height: calc(100vh - 120px);
+    padding: 24px;
+    border-radius: 4px;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+span.legend-circle {
+  position: relative;
+  min-width: 8px;
+  height: 8px;
+  margin-right: 8px;
+  margin-left: 2px;
+  border-radius: 50%;
+}
+
+/*span.legend-circle::before {
+position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-radius: 50%;
+    content: '';
+  }*/
+
+ul.legend-ul {
+  padding-left: 6px;
+}
+
+li.legend-list {
+  margin-bottom: 4px;
+  -webkit-align-items: center;
+  -moz-align-items: center;
+  -ms-align-items: center;
+  align-items: center !important;
+  -ms-flex-align: center;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+}
+
+p.legend-text {
+    font-size: 10px;
+    line-height: 14px;
+    font-family: 'Open Sans';
+    text-transform: uppercase;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.pusher {
+  padding: 24px;
+}
+
+.ui.left.sidebar.popout {
+  width: 380px;
+  background-color: #EE4546;
+  padding: 24px;
+}
+
+.ui.left.sidebar.popout h2 {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 10px;
+  color: #f4f4f5;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-weight: 600;
+}
+
+.ui.left.sidebar.popout h1 {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 24px;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-weight: 600;
+}
+
+.ui.left.sidebar.popout p {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 20px;
+  color: #fff;
+  /*text-transform: uppercase;*/
+  letter-spacing: 1px;
+  font-weight: 300;
+}
+
+.ui.sidebar.menu {
+  background-color: #fff !important;
+  padding: 24px !important;
+  width: 400px !important;
+}
+
+.ui.sidebar.menu  h2 {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 10px;
+  color: #f4f4f5;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-weight: 600;
+}
+
+.ui.sidebar.menu h1 {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 24px;
+  color: #EE4546;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-weight: 600;
+}
+
+.ui.sidebar.menu p {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: #000;
+  /*text-transform: uppercase;*/
+  letter-spacing: 1px;
+  font-weight: 300;
+}
+
+p {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: #000;
+  /*text-transform: uppercase;*/
+  letter-spacing: 1px;
+  font-weight: 300;
+}
+
+
+.ui.sidebar.menu b {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: #000;
+  font-weight: 700 !important;
+  /*text-transform: uppercase;*/
+  letter-spacing: 1px;
+  font-weight: 300;
+}
+
+.ui.sidebar.menu b.wisconsin {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  color: red;
+  font-weight: 700 !important;
+  /*text-transform: uppercase;*/
+  letter-spacing: 1px;
+}
+
+b.wisconsin {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  color: red;
+  font-weight: 700 !important;
+  /*text-transform: uppercase;*/
+  letter-spacing: 1px;
+}
+
+
+p.widget {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 12px;
+  color: #5e5f5f;
+  letter-spacing: 3px;
+}
+
+p.autostyle {
+  font-family: 'Open Sans', sans-serif;
+  color: #a2a2a2;
+  font-size: 10px;
+  letter-spacing: 3px;
+  cursor: pointer;
+}
+
+
+p.autostylecat {
+  font-family: 'Open Sans', sans-serif;
+  color: #a2a2a2;
+  font-size: 10px;
+  letter-spacing: 3px;
+  cursor: pointer;
+}
+ 
+p.autostyle.active {
+  font-family: 'Open Sans', sans-serif;
+  color: #000;
+  font-size: 10px;
+  letter-spacing: 3px;
+  cursor: pointer;
+}
+
+p.autostylecat.active {
+  font-family: 'Open Sans', sans-serif;
+  color: #000;
+  font-size: 10px;
+  letter-spacing: 3px;
+  cursor: pointer;
+}
+
+.smallspace {
+  padding: 3px;
+}
+
+.divider {
+  border-top: 1px solid #bebfbe;
+  padding-bottom: 5px;
+  padding-top: 5px;
+}
