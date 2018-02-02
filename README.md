@@ -1,6 +1,6 @@
 # Isthmus JS
 
-![Isthmus Map](intro.png "Sample Map")
+![Isthmus Map](rail.png "Sample Map")
 
 A simple Javascript library to rapidly develop geospatial applications with CARTO.js and Semantic UI. Easily create:
 
@@ -21,6 +21,8 @@ Make sure you include the following libraries in your code:
 - [CARTO.js](https://carto.com/documentation/cartojs/) 
 - [Semantic UI](https://semantic-ui.com/) 
 - [jQuery](https://developers.google.com/speed/libraries/#jquery)
+
+You can use the `rail.html` file as a sample to get started.
 
 # Quick Docs
 
