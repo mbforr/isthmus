@@ -26,21 +26,26 @@ Make sure you include the following libraries in your code:
 
 After creating your layers, queries, and styles from CARTO.js, particularly the layer you want your widgets to interact with. For example:
 
-`var myQuery = new carto.source.SQL(query)`
+```javascript
+var myQuery = new carto.source.SQL(query)
+```
 
 ## Credentials
 
 First, add your credentials so you can use these to inform your widgets:
 
-`var creds = new accountCreds({
+```javascript
+var creds = new accountCreds({
   apiKey: 'carto-apikey',
   username: 'carto-username',
   map: map
-})`
+})
+```
 
 ## Dropdown
 
-`var drop = new newDropdown({
+```javascript
+var drop = new newDropdown({
   credentials: creds,
   id: 'div_id',
   max: 5,
@@ -48,14 +53,16 @@ First, add your credentials so you can use these to inform your widgets:
   column: 'column_name',
   table: 'table_name',
   title: 'WIDGET TITLE'
-})`
+})
+```
 
 - max: Max number of entries you want to be selectable
 - id: Unique div id for the dropdown
 
 ## Checkbox List
 
-`var checklist = newCheckboxList({
+```javascript
+var checklist = newCheckboxList({
   credentials: creds,
   title: 'WIDGET TITLE',
   name: 'div_id',
@@ -63,43 +70,51 @@ First, add your credentials so you can use these to inform your widgets:
   dataset: 'table_name',
   column: 'column_name',
   aggregation: 'count'
-})`
+})
+```
 
 ## Range Input
 
-`var range = rangeInput({
+```javascript
+var range = rangeInput({
   title: 'WIDGET TITLE',
   credentials: creds,
   name: 'div_id',
 	column: 'column_name',
 	query: myQuery
-})`
+})
+```
 
 ## Checkbox (Layer Control)
 
-`var layer = new newCheckbox({
+```javascript
+var layer = new newCheckbox({
   layer: layerName,
   name: 'div_id',
   credentials: creds,
   label: 'Checkbox Label',
   title: 'WIDGET TITLE',
   checked: false
-})`
+})
+```
 
 ## Simple Input (In Development)
 
-`var input = newInput({
+```javascript
+var input = newInput({
   title: 'WIDGET TITLE',
   name: 'div_id',
   placeholder: 'Placeholder Text',
   min: 0,
   max: 100,
   start: 10
-})`
+})
+```
 
 ## Auto Style
 
-``var style = new autoStyle({
+```javascript
+var style = new autoStyle({
   column: 'column_name',
   layer: myLayer,
   id: 'div_id',
@@ -114,15 +129,16 @@ First, add your credentials so you can use these to inform your widgets:
           marker-line-opacity: 1;
           }`,
   defaultCartocss: myStyle
-})``
+})
+```
 
 ## Info Panel
 
 Control to add a custom slide out panel when clicking a map element.
-
+```javascript
 myLayer.on(carto.layer.events.FEATURE_CLICKED, d => {
 
-``var sidebar = new sidebarInfo({
+var sidebar = new sidebarInfo({
   layer: myLayer,
   content: `<h1> ${d.data.column_name} </h1>
     <h2>TITLE TEXT</h2>
@@ -131,27 +147,32 @@ myLayer.on(carto.layer.events.FEATURE_CLICKED, d => {
     <p> ${d.data.column_name} </p>
     `
 });
-});``
+});
+```
 
 ## File Export
 
-`var export = fileExport({
+```javascript
+var export = fileExport({
  filename: "Filename",
  credentials: creds,
  query: myQuery,
  format: "CSV"
-})`
+})
+```
 
 ## Batch Export
 
-`var batchexport = batchExport({
+```javascript
+var batchexport = batchExport({
 	name: "WIDGET TITLE",
 	description: "Text space to describe what this export will do",
 	credentials: creds,
 	query: myQuery,
 	filename: "new_table_title",
 	format: "CSV"
-})`
+})
+```
 
 ## Query Assembly
 
