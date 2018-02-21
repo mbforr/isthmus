@@ -1,0 +1,422 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>CMS Geocoding Demo</title>
+
+  <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+  <link href="app.css" media="screen" rel="stylesheet" type="text/css" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega/3.0.2/vega.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.0.0-rc3/vega-lite.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0-beta.20/vega-embed.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+  <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+  <script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+  <script src="semantic/dist/semantic.min.js"></script>
+  <script src="semantic/dist/components/dropdown.js"></script>
+  <link rel="stylesheet" type="text/css" href="semantic/dist/components/dropdown.min.css">
+  <!-- Include cartodb.js Library -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.13/leaflet.draw.css" />
+
+  <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+
+  <!-- LEAFLET DRAW -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.13/leaflet.draw.js"></script>
+
+  <script src="https://cdn.rawgit.com/CartoDB/cartodb.js/@4.0.0-alpha.test/carto.js"></script>
+  <script src="isthmus/isthmus.js"></script>
+
+<script>
+
+
+function init() {
+
+var map = L.map('map', {zoomControl: false}).setView([32.8203525,-97.011731], 4);
+
+new L.Control.Zoom({ position: 'bottomleft' }).addTo(map);
+
+var basemap = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy;<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy;<a href="https://carto.com/attribution">CARTO</a>'
+      }).addTo(map);
+
+var client = new carto.Client({
+  apiKey: '665b6d21a3b9c20906057414b7da378b519df141',
+  username: 'mforrest'
+});
+
+var stores = new carto.source.Dataset('hospitals');
+var storesQuery = 'SELECT * FROM hospitals';
+var storesSQL = new carto.source.SQL(storesQuery);
+
+var storesStyle = new carto.style.CartoCSS(`
+#layer {
+  marker-width: 7;
+  marker-fill: #36877a;
+  marker-fill-opacity: 1;
+  marker-allow-overlap: true;
+  marker-line-width: 1;
+  marker-line-color: #FFFFFF;
+  marker-line-opacity: 1;
+}
+`);
+
+var storeLayer = new carto.layer.Layer(storesSQL, storesStyle);
+
+
+client.addLayers([ storeLayer ]);
+client.getLeafletLayer().addTo(map);
+
+var popup = L.popup({ closeButton: false });
+
+storeLayer.setFeatureClickColumns(['name', 'address', 'city', 'state', 'zip', 'telephone', 'type', 'state_id', 'trauma', 'state_id', 'beds']);
+
+//TESTING
+
+
+storeLayer.on(carto.layer.events.FEATURE_CLICKED, d => {
+
+var sidebar = new sidebarInfo({
+  layer: storeLayer,
+  content: `<h1> ${d.data.name} </h1>
+            <h2>Address</h2>
+            <p> ${d.data.address} </p>
+            <p> ${d.data.city}, ${d.data.state}, ${d.data.zip} </p>
+            <h2>Phone</h2>
+            <p> ${d.data.telephone} </p>
+            <h2>Type</h2>
+            <p> ${d.data.type} </p>
+            <h2>License</h2>
+            <p> ${d.data.state_id} </p>
+            <h2>Trauma</h2>
+            <p> ${d.data.trauma} </p>
+            <h2>Beds</h2>
+            <p> ${d.data.beds} </p>
+    `
+});
+});
+
+var creds = new accountCreds({
+  apiKey: '665b6d21a3b9c20906057414b7da378b519df141',
+  username: 'mforrest',
+  map: map
+});
+
+var name = new newDropdown({
+  credentials: creds,
+  id: 'name-dropdown',
+  max: 1,
+  query: storesSQL,
+  column: 'name',
+  table: 'hospitals',
+  title: 'HOSPITAL NAME'
+})
+
+var city = new newDropdown({
+  credentials: creds,
+  id: 'city-dropdown',
+  max: 1,
+  query: storesSQL,
+  column: 'city',
+  table: 'hospitals',
+  title: 'CITY'
+})
+
+var state = new newDropdown({
+  credentials: creds,
+  id: 'state-dropdown',
+  max: 1,
+  query: storesSQL,
+  column: 'state',
+  table: 'hospitals',
+  title: 'STATE'
+})
+
+
+var zip = new newDropdown({
+  credentials: creds,
+  id: 'zip-dropdown',
+  max: 1,
+  query: storesSQL,
+  column: 'zip',
+  table: 'hospitals',
+  title: 'ZIP CODE'
+})
+
+var address = newInput({
+  title: 'SEARCH ADDRESS',
+  name: 'address',
+  placeholder: 'Search address...',
+  start: '350 5th Ave, New York, NY 10118'
+})
+
+// demosLayer.on(carto.layer.events.FEATURE_CLICKED, d => {
+
+// var sidebar = new sidebarInfo({
+//   layer: demosLayer,
+//   content: `<h1>BLOCK GROUP INFORMATION</h1>
+//             <h2>PROBABILITY OF PATRONAGE</h2>
+//             <p> ${d.data.h}%</p>
+//             <h2>PATRONIZING POPULATION</h2>
+//             <p> ${d.data.h} Likely Patrons</p>
+//             <h2>DISTANCE TO TARGET (KM)</h2>
+//             <p> ${d.data.dist_km} </p>
+//     `
+// });
+
+// });
+
+storeLayer.on(carto.layer.events.FEATURE_CLICKED, d => {
+
+var sidebar = new sidebarInfo({
+  layer: storeLayer,
+  content: `<h1> ${d.data.name} </h1>
+            <h2>Address</h2>
+            <p> ${d.data.address} </p>
+            <p> ${d.data.city}, ${d.data.state}, ${d.data.zip} </p>
+            <h2>Phone</h2>
+            <p> ${d.data.telephone} </p>
+            <h2>Type</h2>
+            <p> ${d.data.type} </p>
+            <h2>License</h2>
+            <p> ${d.data.state_id} </p>
+            <h2>Trauma</h2>
+            <p> ${d.data.trauma} </p>
+            <h2>Beds</h2>
+            <p> ${d.data.beds} </p>
+    `
+});
+});
+
+// });
+
+    // <h2>Employees Injured</h2>
+    // <p> ${d.data.rr_employees_injured} </p>
+    // <h2>City</h2>
+    // <p> ${d.data.nearest_city} </p>
+    // <h2>Tons</h2>
+    // <p> ${d.data.tons} </p>
+    // <h2>Total Damage</h2>
+    // <p> ${d.data.total_damage} </p>
+    // <h2>Train Speed</h2>
+    // <p> ${d.data.train_speed} MPH</p>
+    // <h2>Weather</h2>
+    // <p> ${d.data.weather} </p>
+    // <h2>Visibility</h2>
+    // <p> ${d.data.visibility} </p>
+
+$("#button").mousedown(function () {
+
+//CHECKLIST
+
+var addressQ = textQuery({
+    variable: name,
+    column: "name",
+    dropdown: true,
+    name: "name-dropdown"
+  });
+
+var stateQ = textQuery({
+    variable: state,
+    column: "state",
+    dropdown: true,
+    name: "state-dropdown"
+  });
+
+var cityQ = textQuery({
+    variable: city,
+    column: "city",
+    dropdown: true,
+    name: "city-dropdown"
+  });
+
+var zipQ = textQuery({
+    variable: zip,
+    column: "zip",
+    dropdown: true,
+    name: "zip-dropdown"
+  });
+
+var queryFinal = queryFactory({
+  table: 'hospitals',
+  items: [addressQ, stateQ, cityQ, zipQ]
+})
+
+storesSQL.setQuery(queryFinal);
+
+storeLayer.setFeatureClickColumns(['name', 'address', 'city', 'state', 'zip', 'telephone', 'type', 'state_id', 'trauma', 'state_id', 'beds']);
+
+
+storeLayer.on(carto.layer.events.FEATURE_CLICKED, d => {
+
+var sidebar = new sidebarInfo({
+  layer: storeLayer,
+  content: `<h1> ${d.data.name} </h1>
+            <h2>Address</h2>
+            <p> ${d.data.address} </p>
+            <p> ${d.data.city}, ${d.data.state}, ${d.data.zip} </p>
+            <h2>Phone</h2>
+            <p> ${d.data.telephone} </p>
+            <h2>Type</h2>
+            <p> ${d.data.type} </p>
+            <h2>License</h2>
+            <p> ${d.data.state_id} </p>
+            <h2>Trauma</h2>
+            <p> ${d.data.trauma} </p>
+            <h2>Beds</h2>
+            <p> ${d.data.beds} </p>
+    `
+});
+});
+
+console.log(storesSQL._query)
+
+});
+
+$("#button-geo").mousedown(function () {
+
+
+var a = $('#address-input').val()
+
+$.getJSON(`https://mforrest.carto.com/api/v2/sql?q=SELECT ST_AsText(cdb_geocode_street_point('${a}'))&api_key=665b6d21a3b9c20906057414b7da378b519df141`, 
+function( data ) {
+  var q = `SELECT *, round((ST_Distance(the_geom::geography, '${data.rows[0].st_astext}'::geography)/1609.34)::numeric, 2) as dist FROM hospitals WHERE ST_DWithin(the_geom::geography, '${data.rows[0].st_astext}'::geography, 16093.4) LIMIT 15`
+  
+  storesSQL.setQuery(q);
+
+  console.log(q)
+
+})
+
+console.log(storesSQL._query)
+
+storeLayer.setFeatureClickColumns(['name', 'address', 'city', 'state', 'zip', 'telephone', 'type', 'state_id', 'trauma', 'state_id', 'beds', 'dist']);
+
+storeLayer.on(carto.layer.events.FEATURE_CLICKED, d => {
+
+var sidebar = new sidebarInfo({
+  layer: storeLayer,
+  content: `<h1> ${d.data.name} </h1>
+            <p> ${d.data.dist} miles from ${a} </p>
+            <h2>Address</h2>
+            <p> ${d.data.address} </p>
+            <p> ${d.data.city}, ${d.data.state}, ${d.data.zip} </p>
+            <h2>Phone</h2>
+            <p> ${d.data.telephone} </p>
+            <h2>Type</h2>
+            <p> ${d.data.type} </p>
+            <h2>License</h2>
+            <p> ${d.data.state_id} </p>
+            <h2>Trauma</h2>
+            <p> ${d.data.trauma} </p>
+            <h2>Beds</h2>
+            <p> ${d.data.beds} </p>
+    `
+});
+});
+
+});
+
+};
+
+  </script>
+</head>
+
+<body onload="init()">
+
+<!-- SIDEBAR -->
+<div class='app-title'>
+<h1>CMS HOSPITAL SEARCH</h1>
+</div>
+<div class='app-menu'>
+<div class='app-icon open button'>
+  <nav role="navigation">
+  <div id="menuToggle">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+</nav>
+</div>
+
+</div>
+
+
+
+
+<!-- MAP -->
+
+<div class='fullSize' id='map'>
+<div class="legend" id="legend-main" style="display: none;">
+<div class="legend-inner" id="legend-dynamic">
+
+
+</div>
+</div>
+</div>
+
+<div id='toolbar'>
+<div class='widget-content'></div>
+<br></br>
+<p id="button" class="button button--blue">
+<button  class="ui primary button">
+<a style="color:white;" href="#">SEARCH DROPDOWN</a>
+</button>
+</p>
+<p id="button-geo" class="button button--blue">
+<button  class="ui primary button">
+<a style="color:white;" href="#">SEARCH ADDRESS</a>
+</button>
+</p>
+</div>
+<div class="ui left sidebar popout">
+  <p style="color: #fff;">Placeholder</p>
+
+
+<div class="ui sidebar menu inverted vertical menu">
+<h1>About this map</h1>
+<p>Lorem ipsum....</p>
+<p>This map uses <a href="https://semantic-ui.com" target="_blank">Semantic UI</a> for the dropdowns and menus and is very easy to integrate with CARTO.js and jQuery.</p>
+</div>
+
+
+
+
+</div>
+<!-- TOOLBAR -->
+</div>
+
+<script>
+
+$('.ui.sidebar.menu').sidebar({
+  dimPage: false,
+  transition: 'push',
+});
+
+ $('.ui.sidebar.menu')
+.sidebar('attach events', '.open.button');
+
+$('.ui.left.sidebar.popout').sidebar({
+  dimPage: false,
+  transition: 'push',
+  closeable: true,
+  context: '#toolbar',
+  selector: {
+    pusher  : '.pusher-toolbar',
+    sidebar : '.ui.left.sidebar.popout'
+  }
+});
+
+
+</script>
+</body>
+</html>

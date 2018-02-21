@@ -2,25 +2,17 @@
 
 //STYLES
 
+function sidebarColor(c) {
+//just make one giant function that does all this together with the colors and map title
+};
 
-function styleOptions(s) {
-setTimeout( function() {
+function iconColor(c) {
 
-  var side = s.sidebar
-  var titles = s.titles
-  var widgets = s.widgetTitles
-  var icon = s.appIcon
-  var pop = s.popout
+};
 
-  $('.app-menu').css("background", `${side}`);
-  $('h1').css("color", `${titles}`);
-  $('.ui.sidebar.menu h1').css("color", `${titles}`);
-  $('.wisconsin').css("color", `${widgets}`); 
-  $('.app-icon').css("background-color", `${icon}`); 
-  $('.ui.left.sidebar.popout').css("background-color", `${pop}`); 
-  
+function iconImg(c) {
 
-}, 20)};
+};
 
 //ACCOUNT DEFS
 
@@ -68,22 +60,14 @@ function textQuery(settings) {
   return joined
 }
 
-// function timeQuery(s) {
-//   var v = s.variable
-//   var x = ""
-//   var matt = getData(); 
 
-//   console.log(matt)
-// debugger
-// $("#button").mousedown(function () { 
-//   console.log(v)
-//   x = getData(); 
-  
-// })
+function lassoQuery(settings) {
+  v = settings.variable
 
-//   console.log(x)
+  var  joined = ""+v+""
 
-// };
+  return joined
+}
 
 //CHECKBOX ARRAY
 
@@ -103,6 +87,9 @@ $("."+settings.name+"").before(`
     <p><b class="wisconsin">${settings.title}</b></p>
 `)
 
+
+
+// $(".ui.multiple.search.dropdown").mouseout( function () {
 $("#button").mouseup( function () {
 	var query = settings.query._query
 	console.log(query)
@@ -235,10 +222,6 @@ $("<select></select>").attr("id", ""+name+"", "multiple", "").addClass("ui multi
 $(".ui.multiple.dropdown."+name+"").before(`
     <p><b class="wisconsin">${s.title}</b></p>
     `)
-
-$(".ui.multiple.dropdown."+name+"").after(`
-    <br></br>
-`)
 
 $('.ui.multiple.dropdown.'+name+'').dropdown({
   maxSelections: values,
@@ -381,13 +364,11 @@ $("#"+name+"").before(`
 // 	 $('#'+name+'-input-max').removeClass('error');
 //  }
 // });
-styleOptions(s)
+
 });
 };
 
-
 function rangeQuery(s) {
-
 	var name = s.name
 	var col = s.column
 
@@ -396,8 +377,8 @@ function rangeQuery(s) {
 
 	var range = ""+col+" BETWEEN "+inMin+" AND "+inMax+""
 	return range
-};
 
+}
 
 //INPUT
 
@@ -476,13 +457,7 @@ $("p.autostyle").click( function() {
 function queryFactory(settings) {
   var a = settings.items;
   var join = $.grep(a, Boolean).join(" AND ")
-
-  if (join === null || join === "") {
-    var query = "SELECT * FROM "+settings.table+""
-  } else {
   var query = "SELECT * FROM "+settings.table+" WHERE "+join+""
-  }
-
   return query
 }
 
@@ -659,29 +634,14 @@ function lassoTool(s) {
   var drawControl = new L.Control.Draw({
       edit: {
             featureGroup: drawnItems,
-            polygon: {
-                allowIntersection: false,
-                edit: false
+            poly: {
+                allowIntersection: false
             }
         },
         draw: {
-            polygon: true,            
-            polyline: false,
-            line: false,
-            marker: false,
-            rectangle: {
-                allowIntersection: false,
-                showArea: true,
-                metric: false,
-                precision: {feet: 10, mi: 10, yd: 5}
-            },
-            //circle: true,
-            circlemarker: false,
             polygon: {
                 allowIntersection: false,
-                showArea: true,
-                metric: false,
-                precision: {feet: 10, mi: 10, yd: 5}
+                showArea: true
             }
         },
       position: 'bottomleft'
@@ -693,269 +653,49 @@ function lassoTool(s) {
 
 
 
-  map.on(L.Draw.Event.CREATED, e => {
-
-    var mainquery = s.query._query
-
-    var layer = e.layer;
-    drawnItems.addLayer(layer);
-    var geojson = JSON.stringify(layer.toGeoJSON().geometry)
-
-    console.log(geojson);
-    console.log('MAIN QUERY' + mainquery);
-
-    var bbox = `St_Intersects(the_geom, St_SetSRID(St_GeomFromGeoJSON('${geojson}'), 4326))`;
-
-    query.setQuery(`with a as (${mainquery}) select * from a where ${bbox}`)
-
-    $("#button").mouseup( function () {
-      var mainquery = s.query._query
-      //var geojson = JSON.stringify(drawnItems.toGeoJSON().features[0].geometry)
-      var i = drawnItems._layers
-      if (jQuery.isEmptyObject(i)) {
-        query.setQuery(`${mainquery}`)
-      } else {
-        query.setQuery(`with a as (${mainquery}) select * from a where ${bbox}`)
-      }      
-    });
-
-  })
-
-//ADD CIRCLE CONTROLS
-//TURN OFF IF ONE THING IS ACTIVE
-
-}
-
-//TIME SERIES
-
-function getData(e) {
-  console.log(e)
-  return e
-};
-
-function timeSeries(s) {
-
-var sqlStart = s.credentials.sqlURL
-var sqlEnd = s.credentials.sqlEnd
-var group = s.grouping
-var aggdate = s.dateAggregation
-var agg = s.aggregation
-var date = s.date
-var col = s.numericColumn
-var dataset = s.dataset
-var query = s.query._query
-var sql = s.query
-var d = ""
-
-var date1 = ""
-var date2 = ""
-
-$("<div></div>").addClass("bottom").insertAfter( ".fullSize" ).attr("id", "timeseries");
-
-$('.fullSize').css("height", "60%");
+var on = map.on(L.Draw.Event.CREATED, (e) => {
+  var mainquery = s.query._query
+  var layer = e.layer;
+  drawnItems.addLayer(layer);
+  var geojson = JSON.stringify(layer.toGeoJSON().geometry)
+  var bbox = `St_Intersects(the_geom, St_SetSRID(St_GeomFromGeoJSON('${geojson}'), 4326))`;
+});
 
 
-var url = `${sqlStart}WITH a AS (${query}) select to_char(date_trunc('${aggdate}', ${date}), 'MM-DD-YYYY') as c_date, ${group}, ${agg}(${col}) as damage from a group by 1, 2 order by 1`
 
-var width = document.getElementById('timeseries').offsetWidth;
-var width = width - 100
+map.on('draw:delete', (e) => {
 
-var opt = {
-  "padding" : 30,
-  "actions" : false
-}
+  bbox = ""
 
-var yourVlSpec = {
-  "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
+}); 
+//CONTROLS TO REMOVE IT
+//IF CIRCLE
+
+var geom = ""
+
+$("#button").click( function () {
+
+var geom = JSON.stringify(drawnItems.toGeoJSON().features[0].geometry)
+
+if (geom === undefined) {
   
-  "data": {"url": url, 
-  "format": {
-    "type": "json", "property": "rows"
-  }},
+  var geom = null
 
-  "vconcat": [{
-    "width": width,
-    "mark": {
-      "type": "line",
-      "interpolate": "monotone"
-  },
-    "encoding": {
-      "x": {
-        "field": "c_date",
-        "type": "temporal",
-        "scale": {"domain": {"selection": "brush"}},
-        "axis": {"title": "", "format": "%b %y", "labelAngle": 0}
-      },
-      "y": {
-        "field": "damage", 
-        "type": "quantitative",
-        "axis": {
-          "title": ""
-        },
-      },
-      "color": {
-        "field": "railroad", 
-        "type": "nominal", 
-        "legend": false,
-        "scale": {
-          "range": ["#00AFD7", "#E0004D", "#FFC72C", "#F68D2E", "#63666A"]
-        }
-      }
-    }
-  }, {
-    "width": width,
-    "height": 40,
-    "mark": {"type": "line",
-    "interpolate": "monotone"},
-    "selection": {
-      "brush": {"type": "interval", "encodings": ["x"]}
-    },
-    "encoding": {
-      "x": {
-        "field": "c_date",
-        "type": "temporal",
-        "axis": {"format": "%b %y", "labelAngle": 0, "title": ""}
-      },
-      "y": {
-        "field": "damage",
-        "aggregate": "sum",
-        "type": "quantitative",
-        "axis": {"tickCount": 3, "grid": false, "title": ""}
-      }
-    }
-  }]
+} else {
+
+  var geom = JSON.stringify(drawnItems.toGeoJSON().features[0].geometry)
+
 }
 
-vega.embed("#timeseries", yourVlSpec, [opt]).catch(console.error)
+console.log(geom)
+return geom
 
-.then(
+})
 
-function (result) {
 
-$('#timeseries').mouseup(function () {
-    
-    var format = d3.timeFormat("%Y-%m-%d");
-    
-    date1 = format(result.view.data('brush_store')[0].intervals[0].extent[0]);    
-    date2 = format(result.view.data('brush_store')[0].intervals[0].extent[1]);
+return geom
 
-    d = `${date} BETWEEN '${date1}' AND '${date2}'`
-
-    sql.setQuery(`WITH a AS (${query}) SELECT * FROM a WHERE ${d}`);
-    console.log(`WITH a AS (${query}) SELECT * FROM a WHERE ${d}`)
-});
-});
-
-$("#button").mouseup(function () {
-
-var query = s.query._query
-
-$(".bottom").empty();
-
-var url = `${sqlStart}WITH a AS (${query}) select to_char(date_trunc('${aggdate}', ${date}), 'MM-DD-YYYY') as c_date, ${group}, ${agg}(${col}) as damage from a group by 1, 2 order by 1`
-
-var width = document.getElementById('timeseries').offsetWidth;
-var width = width - 100
-
-var opt = {
-  "padding" : 30,
-  "actions" : false
 }
 
-var yourVlSpec = {
-  "$schema": "https://vega.github.io/schema/vega-lite/v2.json",
-  
-  "data": {"url": url, 
-  "format": {
-    "type": "json", "property": "rows"
-  }},
 
-  "vconcat": [{
-    "width": width,
-    "mark": {
-      "type": "line",
-      "interpolate": "monotone"
-  },
-    "encoding": {
-      "x": {
-        "field": "c_date",
-        "type": "temporal",
-        "scale": {"domain": {"selection": "brush"}},
-        "axis": {"title": "", "format": "%b %y", "labelAngle": 0}
-      },
-      "y": {
-        "field": "damage", 
-        "type": "quantitative",
-        "axis": {
-          "title": ""
-        },
-      },
-      "color": {
-        "field": "railroad", 
-        "type": "nominal", 
-        "legend": false,
-        "scale": {
-          "range": ["#00AFD7", "#E0004D", "#FFC72C", "#F68D2E", "#63666A"]
-        }
-      }
-    }
-  }, {
-    "width": width,
-    "height": 40,
-    "mark": {"type": "line",
-    "interpolate": "monotone"},
-    "selection": {
-      "brush": {"type": "interval", "encodings": ["x"]}
-    },
-    "encoding": {
-      "x": {
-        "field": "c_date",
-        "type": "temporal",
-        "axis": {"format": "%b %y", "labelAngle": 0, "title": ""}
-      },
-      "y": {
-        "field": "damage",
-        "aggregate": "sum",
-        "type": "quantitative",
-        "axis": {"tickCount": 3, "grid": false, "title": ""}
-      }
-    }
-  }]
-}
-
-vega.embed("#timeseries", yourVlSpec, [opt]).catch(console.error)
-
-.then(
-
-function (result) {
-
-$('#timeseries').mouseup(function () {
-    
-    var format = d3.timeFormat("%Y-%m-%d");
-    
-    date1 = format(result.view.data('brush_store')[0].intervals[0].extent[0]);    
-    date2 = format(result.view.data('brush_store')[0].intervals[0].extent[1]);
-
-    d = `${date} BETWEEN '${date1}' AND '${date2}'`
-
-    sql.setQuery(`WITH a AS (${query}) SELECT * FROM a WHERE ${d}`);
-    console.log(`WITH a AS (${query}) SELECT * FROM a WHERE ${d}`)
-});
-});
-});
-
-// x = getData(d);
-// console.log(x)
-// return x
-
-};
-
-
-
-function assembleQuery() {
-  //in each function it needs to read the values every time and run the assemble the query 
-  //grabs the value from where it is run
-  //assembles all the values
-  //does the boolean join
-  //udpates the map
-}
+//IMPORTS
