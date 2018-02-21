@@ -8,7 +8,7 @@ html, body {width:100%; height:100%; padding: 0; margin: 0;}
     right: 380px;
     border: none;
     /*width: 100%;*/
-    z-index: -1000;
+    /*z-index: -1000;*/
     height: 100%;
 }
 

@@ -235,10 +235,9 @@ $("<select></select>").attr("id", ""+name+"", "multiple", "").addClass("ui multi
 $(".ui.multiple.dropdown."+name+"").before(`
     <p><b class="wisconsin">${s.title}</b></p>
     `)
-
-$(".ui.multiple.dropdown."+name+"").after(`
-    <br></br>
-`)
+// $(".ui.multiple.dropdown."+name+"").after(`
+//     <br></br>
+// `)
 
 $('.ui.multiple.dropdown.'+name+'').dropdown({
   maxSelections: values,
@@ -476,13 +475,11 @@ $("p.autostyle").click( function() {
 function queryFactory(settings) {
   var a = settings.items;
   var join = $.grep(a, Boolean).join(" AND ")
-
   if (join === null || join === "") {
     var query = "SELECT * FROM "+settings.table+""
   } else {
   var query = "SELECT * FROM "+settings.table+" WHERE "+join+""
   }
-
   return query
 }
 

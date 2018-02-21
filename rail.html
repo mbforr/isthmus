@@ -1,0 +1,345 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+  <title>Rail Accidents in the US</title>
+
+  <link href='https://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+  <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600" rel="stylesheet">
+  <link href="app.css" media="screen" rel="stylesheet" type="text/css" />
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega/3.0.2/vega.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-lite/2.0.0-rc3/vega-lite.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vega-embed/3.0.0-beta.20/vega-embed.js"></script>
+  <script src="https://d3js.org/d3.v4.min.js"></script>
+
+
+  <link rel="stylesheet" type="text/css" href="semantic/dist/semantic.min.css">
+  <script
+  src="https://code.jquery.com/jquery-3.1.1.min.js"
+  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+  crossorigin="anonymous"></script>
+  <script src="semantic/dist/semantic.min.js"></script>
+  <script src="semantic/dist/components/dropdown.js"></script>
+  <link rel="stylesheet" type="text/css" href="semantic/dist/components/dropdown.min.css">
+  <!-- Include cartodb.js Library -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.2.0/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.13/leaflet.draw.css" />
+
+  <script src="https://unpkg.com/leaflet@1.2.0/dist/leaflet.js"></script>
+
+  <!-- LEAFLET DRAW -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.13/leaflet.draw.js"></script>
+
+  <script src="https://cdn.rawgit.com/CartoDB/cartodb.js/@4.0.0-alpha.test/carto.js"></script>
+  <script src="isthmus/isthmus.js"></script>
+
+<script>
+
+
+function init() {
+
+var map = L.map('map', {zoomControl: false}).setView([32.8203525,-97.011731], 4);
+
+new L.Control.Zoom({ position: 'bottomleft' }).addTo(map);
+
+var basemap = L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}.png', {
+        maxZoom: 18,
+        attribution: '&copy;<a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>, &copy;<a href="https://carto.com/attribution">CARTO</a>'
+      }).addTo(map);
+
+var client = new carto.Client({
+  apiKey: 'api-key',
+  username: 'mforrest'
+});
+
+var rail = new carto.source.Dataset('rail_accidents');
+var railQuery = 'SELECT * FROM rail_accidents';
+var railSQL = new carto.source.SQL(railQuery);
+
+var railStyle = new carto.style.CartoCSS(`
+#layer {
+  marker-width: ramp([rr_employees_injured], range(5, 30), equal(5));
+  marker-fill: ramp([total_damage], (#f3e79b, #fac484, #f8a07e, #eb7f86, #ce6693, #a059a0, #5c53a5), quantiles);
+  marker-fill-opacity: 1;
+  marker-allow-overlap: true;
+  marker-line-width: 1;
+  marker-line-color: #FFFFFF;
+  marker-line-opacity: 1;
+}
+`);
+
+var states = new carto.source.Dataset('us_states_2018');
+var statesQuery = 'SELECT * FROM us_states_2018';
+var statesSQL = new carto.source.SQL(statesQuery);
+var statesStyle = new carto.style.CartoCSS(`
+#layer {
+  polygon-fill: ramp([region], (#5F4690, #1D6996, #38A6A5, #0F8554, #73AF48), ("3", "4", "2", "1", "9"), "=");
+}
+#layer::outline {
+  line-width: 1;
+  line-color: #FFFFFF;
+  line-opacity: 0.5;
+}
+`);
+
+
+var railLayer = new carto.layer.Layer(railSQL, railStyle);
+var statesLayer = new carto.layer.Layer(statesSQL, statesStyle);
+
+
+client.addLayers([ railLayer ]);
+client.getLeafletLayer().addTo(map);
+
+var popup = L.popup({ closeButton: false });
+
+railLayer.setFeatureClickColumns(['railroad', 'rr_employees_injured', 'nearest_city', 'tons', 'total_damage', 'train_speed', 'weather', 'visibility']);
+
+//TESTING
+
+var creds = new accountCreds({
+  apiKey: 'api-key',
+  username: 'mforrest',
+  map: map
+});
+
+var drop = new newDropdown({
+  credentials: creds,
+  id: 'rr-dropdown',
+  max: 5,
+  query: railSQL,
+  column: 'railroad',
+  table: 'rail_accidents',
+  title: 'RAILROAD COMPANY'
+})
+
+var check = new newCheckbox({
+  layer: statesLayer,
+  name: 'states',
+  credentials: creds,
+  label: 'State Boundaries',
+  title: 'STATES',
+  checked: false
+})
+
+var input = newInput({
+  title: 'TEXT INPUT',
+  name: 'input',
+  placeholder: 'Input your number...',
+  min: 0,
+  max: 100,
+  start: 10
+})
+
+var range = rangeInput({
+  title: 'YEAR',
+  credentials: creds,
+  name: 'year',
+	column: 'year',
+	query: railSQL
+})
+
+// var lasso = lassoTool({
+//   credentials: creds,
+//   query: railSQL
+// })
+
+var checklist = newCheckboxList({
+  credentials: creds,
+  title: 'WEATHER',
+  name: 'weather',
+  query: railSQL,
+  dataset: 'rail_accidents',
+  column: 'weather',
+  aggregation: 'count'
+})
+
+var autostyle = new autoStyle({
+  column: 'railroad',
+  layer: railLayer,
+  id: 'rail-style',
+  title: 'STYLE BY RAILROAD',
+  cartocss: `#layer {
+  marker-width: ramp([rr_employees_injured], range(5, 30), equal(5));
+  marker-fill: ramp([railroad], (#5F4690, #1D6996, #38A6A5, #0F8554, #73AF48, #EDAD08, #E17C05, #CC503E, #94346E, #6F4070, #666666), ("UP", "BNSF", "CSX", "NS", "ATK", "KCS", "IC", "NJTR", "CRSH", "MNCW"), "=");
+  marker-fill-opacity: 1;
+  marker-allow-overlap: true;
+  marker-line-width: 1;
+  marker-line-color: #FFFFFF;
+  marker-line-opacity: 1;
+  }`,
+  defaultCartocss: railStyle
+})
+
+railLayer.on(carto.layer.events.FEATURE_CLICKED, d => {
+
+var sidebar = new sidebarInfo({
+  layer: railLayer,
+  content: `<h1> ${d.data.railroad} </h1>
+    <h2>Employees Injured</h2>
+    <p> ${d.data.rr_employees_injured} </p>
+    <h2>City</h2>
+    <p> ${d.data.nearest_city} </p>
+    <h2>Tons</h2>
+    <p> ${d.data.tons} </p>
+    <h2>Total Damage</h2>
+    <p> ${d.data.total_damage} </p>
+    <h2>Train Speed</h2>
+    <p> ${d.data.train_speed} MPH</p>
+    <h2>Weather</h2>
+    <p> ${d.data.weather} </p>
+    <h2>Visibility</h2>
+    <p> ${d.data.visibility} </p>
+    `
+});
+
+});
+
+var csvExport = fileExport({
+ filename: "Rail Report",
+ credentials: creds,
+ query: railSQL,
+ format: "CSV"
+})
+
+var batchexport = batchExport({
+	name: "BATCH EXPORT",
+	description: "Download and create a table on your CARTO account based on your current query",
+	credentials: creds,
+	query: railSQL,
+	filename: "matts_file",
+	format: "CSV"
+})
+
+// var styles = styleOptions({
+//   sidebar: "#1785FB",
+//   titles: "#b2b2b2",
+//   widgetTitles: "#b2b2b2",
+//   appIcon: "#619DF5",
+//   popout: "#1785FB"
+// });
+
+$("#button").mousedown(function () {
+
+//CHECKLIST
+
+var checkquery = textQuery({
+    variable: checklist,
+    column: "weather"
+  });
+
+console.log(time)
+
+var range = rangeQuery({
+    name: 'year',
+    column: 'year'
+});
+
+var dropquery = textQuery({
+    variable: drop,
+    column: "railroad",
+    dropdown: true,
+    name: "rr-dropdown"
+  });
+
+var queryFinal = queryFactory({
+  table: 'rail_accidents',
+  items: [checkquery, dropquery, range, time]
+})
+
+railSQL.setQuery(queryFinal);
+
+console.log(railSQL._query)
+
+});
+
+};
+
+  </script>
+</head>
+
+<body onload="init()">
+
+<!-- SIDEBAR -->
+<div class='app-title'>
+<h1>RAIL ACCIDENTS IN THE US</h1>
+</div>
+<div class='app-menu'>
+<div class='app-icon open button'>
+  <nav role="navigation">
+  <div id="menuToggle">
+    <span></span>
+    <span></span>
+    <span></span>
+</div>
+</nav>
+</div>
+
+</div>
+
+
+
+
+<!-- MAP -->
+
+<div class='fullSize' id='map'>
+<div class="legend" id="legend-main" style="display: none;">
+<div class="legend-inner" id="legend-dynamic">
+
+
+</div>
+</div>
+</div>
+
+<div id='toolbar'>
+<div class='widget-content'></div>
+<br></br>
+<p id="button" class="button button--blue">
+<button  class="ui primary button">
+<a style="color:white;" href="#">VISUALIZE</a>
+</button>
+</p>
+</div>
+<div class="ui left sidebar popout">
+  <p style="color: #fff;">Placeholder</p>
+
+
+<div class="ui sidebar menu inverted vertical menu">
+<h1>About this map</h1>
+<p>Lorem ipsum....</p>
+<p>This map uses <a href="https://semantic-ui.com" target="_blank">Semantic UI</a> for the dropdowns and menus and is very easy to integrate with CARTO.js and jQuery.</p>
+</div>
+
+
+
+
+</div>
+<!-- TOOLBAR -->
+</div>
+
+<script>
+
+$('.ui.sidebar.menu').sidebar({
+  dimPage: false,
+  transition: 'push',
+});
+
+ $('.ui.sidebar.menu')
+.sidebar('attach events', '.open.button');
+
+$('.ui.left.sidebar.popout').sidebar({
+  dimPage: false,
+  transition: 'push',
+  closeable: true,
+  context: '#toolbar',
+  selector: {
+    pusher  : '.pusher-toolbar',
+    sidebar : '.ui.left.sidebar.popout'
+  }
+});
+
+
+</script>
+</body>
+</html>
